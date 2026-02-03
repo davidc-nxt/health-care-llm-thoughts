@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: clinic-ai-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: clinic_user
+      POSTGRES_PASSWORD: clinic_secure_pass
+      POSTGRES_DB: clinic_ai
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./init_pgvector.sql:/docker-entrypoint-initdb.d/init_pgvector.sql
+      - clinic_ai_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clinic_user -d clinic_ai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  clinic_ai_data:
+    driver: local

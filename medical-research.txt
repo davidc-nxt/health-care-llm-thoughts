@@ -1,0 +1,19 @@
+1. Top Open APIs for Research Papers
+PubMed Central (PMC) Open Access Web Service: Provides programmatic discovery and download of the PMC Open Access Subset, which includes full-text articles and metadata.
+Europe PMC RESTful API: Offers access to over 40 million records, including PubMed citations and full-text open-access papers. It is highly regarded for its Annotations API which identifies text-mined terms like genes, proteins, and diseases.
+CORE (Connecting Repositories): The world's largest aggregator of open-access research papers. Its API provides metadata and full-text access to global research repositories.
+arXiv API: Primarily for pre-prints, but it hosts a significant volume of quantitative biology and bioinformatics research. 
+2. Specialized Clinical & Data Repositories
+Health Data Nexus: A repository from the University of Toronto that shares de-identified health datasets specifically formatted for AI research.
+Dryad Digital Repository: An open-source, curated repository for publicly available research data across basic sciences and medicine.
+Zenodo: A general-purpose repository used by many medical researchers to host large datasets, code, and supplementary paper materials.
+OpenFDA API: Provides public access to FDA data regarding drug labeling, adverse events, and medical device recalls. 
+3. Medical Imaging & Informatics APIs
+PYCAD: A specialized platform offering AI-driven imaging solutions for processing DICOM files and medical imaging data.
+NCBI Entrez Programming Utilities (E-utilities): A suite of eight server-side programs that provide a stable interface into all Entrez databases, including PubMed. 
+Repository Comparison Table
+Source 	Best For	Access Type
+PubMed Central	Full-text clinical papers	REST API / FTP
+Europe PMC	Text-mining & biological annotations	REST API
+CORE	Large-scale metadata harvesting	REST API
+Dryad	Raw medical datasets	Web/API
