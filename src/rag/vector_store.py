@@ -170,7 +170,7 @@ class VectorStore:
 
         # Build query with optional specialty filter
         specialty_filter = ""
-        params = {"top_k": top_k}
+        params = {"top_k": top_k, "min_similarity": min_similarity}
 
         if specialty:
             specialty_filter = "AND chunk_metadata->>'specialty' = :specialty"
@@ -189,7 +189,7 @@ class VectorStore:
                             rp.source_url
                         FROM paper_chunks pc
                         JOIN research_papers rp ON pc.paper_id = rp.id
-                        WHERE 1 - (pc.embedding <=> '{vector_literal}'::vector) >= {min_similarity}
+                        WHERE 1 - (pc.embedding <=> '{vector_literal}'::vector) >= :min_similarity
                         {specialty_filter}
                         ORDER BY pc.embedding <=> '{vector_literal}'::vector
                         LIMIT :top_k
@@ -199,11 +199,18 @@ class VectorStore:
 
                 results = []
                 for row in result:
+                    # Handle chunk_metadata: JSONB may come as dict or str
+                    metadata = row[2]
+                    if isinstance(metadata, str):
+                        metadata = json.loads(metadata)
+                    elif metadata is None:
+                        metadata = {}
+
                     results.append(
                         {
                             "id": row[0],
                             "content": row[1],
-                            "metadata": json.loads(row[2]) if row[2] else {},
+                            "metadata": metadata,
                             "similarity": float(row[3]),
                             "title": row[4],
                             "source_url": row[5],

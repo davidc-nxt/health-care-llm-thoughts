@@ -28,9 +28,9 @@ CREATE TABLE IF NOT EXISTS paper_chunks (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create index for vector similarity search
+-- Create HNSW index for vector similarity search (works for any dataset size)
 CREATE INDEX IF NOT EXISTS paper_chunks_embedding_idx 
-ON paper_chunks USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+ON paper_chunks USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
 
 -- Specialty index for filtering
 CREATE INDEX IF NOT EXISTS paper_chunks_specialty_idx

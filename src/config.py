@@ -20,7 +20,7 @@ class Settings(BaseSettings):
 
     # Database
     database_url: PostgresDsn = Field(
-        default="postgresql://clinic_user:clinic_secure_pass@localhost:5433/clinic_ai",
+        default="postgresql://clinic_user:changeme_in_production@localhost:5433/clinic_ai",
         description="PostgreSQL connection string",
     )
 
