@@ -76,6 +76,14 @@ class Settings(BaseSettings):
     embedding_model: str = Field(default="all-MiniLM-L6-v2")
     embedding_dimension: int = Field(default=384)
 
+    # MCP Server
+    mcp_api_key: str = Field(
+        default="", description="API key for MCP server authentication"
+    )
+    mcp_server_port: int = Field(
+        default=8765, description="Port for MCP SSE transport"
+    )
+
     @field_validator("encryption_key")
     @classmethod
     def validate_encryption_key(cls, v: str) -> str:

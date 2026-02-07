@@ -318,6 +318,42 @@ def generate_key():
     click.echo(f"   {key}")
     click.echo("\nAdd this to your .env file as ENCRYPTION_KEY")
 
+@cli.command("mcp-serve")
+@click.option(
+    "--transport",
+    type=click.Choice(["stdio", "sse"]),
+    default="stdio",
+    help="MCP transport protocol",
+)
+def mcp_serve(transport):
+    """Start the MCP (Model Context Protocol) server.
+
+    Exposes research search, medical advice, FHIR/HL7 integration,
+    and PHI encryption as MCP tools for AI clients.
+
+    \b
+    Examples:
+        python -m src.cli mcp-serve               # stdio (Claude Desktop)
+        python -m src.cli mcp-serve --transport sse  # SSE (web clients)
+    """
+    click.echo("🔌 Starting MCP Server...")
+    click.echo(f"   Transport: {transport}")
+    click.echo(f"   Tools: 8 | Resources: 3")
+
+    from src.config import get_settings
+
+    settings = get_settings()
+    if settings.mcp_api_key:
+        click.echo("   Auth: API key required ✅")
+    else:
+        click.echo("   Auth: Open access (set MCP_API_KEY for security)")
+
+    click.echo()
+
+    from src.mcp_server import mcp as mcp_app
+
+    mcp_app.run(transport=transport)
+
 
 if __name__ == "__main__":
     cli()

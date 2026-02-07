@@ -5,7 +5,8 @@ A **HIPAA-compliant** AI system that accelerates patient history review and clin
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pgvector-336791.svg)](https://github.com/pgvector/pgvector)
 [![HIPAA](https://img.shields.io/badge/HIPAA-Compliant-green.svg)](#hipaa-compliance)
-[![Tests](https://img.shields.io/badge/Tests-9%2F9%20Passing-success.svg)](#testing)
+[![MCP](https://img.shields.io/badge/MCP-Compatible-purple.svg)](#-mcp-integration)
+[![Tests](https://img.shields.io/badge/Tests-24%20Passing-success.svg)](#testing)
 
 ---
 
@@ -13,6 +14,7 @@ A **HIPAA-compliant** AI system that accelerates patient history review and clin
 
 - [Features](#-features)
 - [Architecture](#-architecture)
+- [MCP Integration](#-mcp-integration)
 - [Standards Compliance](#-standards-compliance)
 - [Quick Start](#-quick-start)
 - [CLI Commands](#-cli-commands)
@@ -43,40 +45,131 @@ A **HIPAA-compliant** AI system that accelerates patient history review and clin
 - **Tamper-Proof Audit Logs**: SHA-256 hash chaining for forensic integrity
 - **PHI Access Tracking**: Every data access logged with user context
 
+### MCP (Model Context Protocol)
+- **8 Medical AI Tools**: Search, ingest, advise, FHIR, HL7, encrypt, decrypt, status
+- **3 Data Resources**: Specialties, platform stats, FHIR capabilities
+- **API Key Authentication**: Secure tool access for connected AI clients
+- **Dual Transport**: stdio (Claude Desktop, Cursor) + SSE (web clients)
+
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        CLI Interface                             │
-│                    (Click-based commands)                        │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-        ┌──────────────────┼──────────────────┐
-        ▼                  ▼                  ▼
-┌───────────────┐  ┌───────────────┐  ┌───────────────┐
-│   Ingestion   │  │  RAG Pipeline │  │ EHR Connector │
-│   PubMed      │  │  Chunking     │  │ FHIR Client   │
-│   arXiv       │  │  Embeddings   │  │ HL7 Handler   │
-└───────┬───────┘  │  Vector Store │  │ Epic OAuth2   │
-        │          │  Advisor      │  │ Mirth API     │
-        │          └───────┬───────┘  └───────┬───────┘
-        │                  │                  │
-        └──────────────────┼──────────────────┘
-                           ▼
-        ┌─────────────────────────────────────┐
-        │    PostgreSQL + pgvector            │
-        │    (Vector Similarity Search)       │
-        └──────────────────┬──────────────────┘
-                           │
-        ┌──────────────────┼──────────────────┐
-        ▼                  ▼                  ▼
-┌───────────────┐  ┌───────────────┐  ┌───────────────┐
-│  Encryption   │  │ Audit Logger  │  │  Settings     │
-│  (Fernet)     │  │ (Hash Chain)  │  │  (Pydantic)   │
-└───────────────┘  └───────────────┘  └───────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│                     MCP Server (FastMCP)                            │
+│         8 Tools  ·  3 Resources  ·  API Key Auth                   │
+│         stdio / SSE Transport                                      │
+└────────────────────────────┬─────────────────────────────────────────┘
+                             │
+┌────────────────────────────┼─────────────────────────────────────────┐
+│                        CLI Interface                                │
+│                    (Click-based commands)                           │
+└────────────────────────────┬─────────────────────────────────────────┘
+                             │
+         ┌───────────────────┼───────────────────┐
+         ▼                   ▼                   ▼
+ ┌───────────────┐   ┌───────────────┐   ┌───────────────┐
+ │   Ingestion   │   │  RAG Pipeline │   │ EHR Connector │
+ │   PubMed      │   │  Chunking     │   │ FHIR Client   │
+ │   arXiv       │   │  Embeddings   │   │ HL7 Handler   │
+ └───────┬───────┘   │  Vector Store │   │ Epic OAuth2   │
+         │           │  Advisor      │   │ Mirth API     │
+         │           └───────┬───────┘   └───────┬───────┘
+         │                   │                   │
+         └───────────────────┼───────────────────┘
+                             ▼
+         ┌─────────────────────────────────────────┐
+         │    PostgreSQL + pgvector                │
+         │    (HNSW Vector Similarity Search)      │
+         └──────────────────┬──────────────────────┘
+                            │
+         ┌──────────────────┼──────────────────┐
+         ▼                  ▼                  ▼
+ ┌───────────────┐  ┌───────────────┐  ┌───────────────┐
+ │  Encryption   │  │ Audit Logger  │  │  Settings     │
+ │  (Fernet)     │  │ (Hash Chain)  │  │  (Pydantic)   │
+ └───────────────┘  └───────────────┘  └───────────────┘
 ```
+
+---
+
+## 🔌 MCP Integration
+
+The platform includes a full **Model Context Protocol (MCP) server**, allowing any MCP-compatible AI client to connect and use the platform's medical research, EHR, and clinical decision support capabilities.
+
+### Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `system_status` | Check database, pgvector, API health |
+| `search_papers` | Semantic search across indexed research |
+| `ingest_papers` | Fetch + index papers from PubMed/arXiv |
+| `get_medical_advice` | RAG-powered clinical guidance with citations |
+| `get_patient_summary` | FHIR patient demographics, conditions, meds, labs |
+| `parse_hl7_message` | Parse HL7 v2 ADT messages |
+| `encrypt_phi` | AES-256 Fernet encryption for PHI |
+| `decrypt_phi` | Decrypt previously encrypted data |
+
+### Available Resources
+
+| Resource URI | Description |
+|-------------|-------------|
+| `medical://specialties` | Supported medical specialties with MeSH terms |
+| `medical://stats` | Paper/chunk counts, embedding model info |
+| `medical://fhir/capabilities` | FHIR resource types and EHR integrations |
+
+### Start the MCP Server
+
+```bash
+# stdio transport (for Claude Desktop, Cursor, etc.)
+python -m src.cli mcp-serve
+
+# SSE transport (for web clients)
+python -m src.cli mcp-serve --transport sse
+```
+
+### Connect from Claude Desktop
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "medical-ai": {
+      "command": "python",
+      "args": ["-m", "src.cli", "mcp-serve"],
+      "cwd": "/path/to/clinic-ai-llm",
+      "env": {
+        "MCP_API_KEY": "your_api_key"
+      }
+    }
+  }
+}
+```
+
+### Connect from Cursor
+
+Add to `.cursor/mcp.json` in your project:
+
+```json
+{
+  "mcpServers": {
+    "medical-ai": {
+      "command": "python",
+      "args": ["-m", "src.cli", "mcp-serve"],
+      "cwd": "/path/to/clinic-ai-llm",
+      "env": {
+        "MCP_API_KEY": "your_api_key"
+      }
+    }
+  }
+}
+```
+
+### Authentication
+
+Set `MCP_API_KEY` in your `.env` file. When configured, all tool calls require the matching `api_key` parameter. Without it, the server runs in open access mode (development only).
 
 ---
 
@@ -381,7 +474,7 @@ python -m pytest tests/ -v
 # Run with coverage
 python -m pytest tests/ --cov=src --cov-report=html
 
-# Current results: 9/9 passing
+# Current results: 24 passing (9 core + 15 MCP)
 ```
 
 ### Test Coverage
@@ -393,6 +486,10 @@ python -m pytest tests/ --cov=src --cov-report=html
 | `ehr.hl7v2_handler` | 2 | ✅ Pass |
 | `ingestion.pubmed_client` | 1 | ✅ Pass |
 | `ehr.fhir_client` | 1 | ✅ Pass |
+| `mcp_server` (auth) | 4 | ✅ Pass |
+| `mcp_server` (tools) | 6 | ✅ Pass |
+| `mcp_server` (resources) | 4 | ✅ Pass |
+| `mcp_server` (registration) | 1 | ✅ Pass |
 
 ---
 
@@ -408,6 +505,7 @@ clinic-ai-llm/
 │   ├── __init__.py
 │   ├── config.py            # Pydantic settings
 │   ├── cli.py               # Click CLI
+│   ├── mcp_server.py        # ★ MCP server (8 tools, 3 resources)
 │   ├── ingestion/           # Research paper clients
 │   │   ├── pubmed_client.py
 │   │   └── arxiv_client.py
@@ -426,7 +524,8 @@ clinic-ai-llm/
 │       └── audit_logger.py
 └── tests/
     └── unit/
-        └── test_components.py
+        ├── test_components.py
+        └── test_mcp_server.py  # ★ MCP tests (15 tests)
 ```
 
 ---
@@ -438,6 +537,7 @@ clinic-ai-llm/
 | **Language** | Python 3.10+ | Core application |
 | **Database** | PostgreSQL 16 | Relational storage |
 | **Vector DB** | pgvector 0.8.1 | Similarity search |
+| **MCP** | mcp SDK 1.26+ | Model Context Protocol |
 | **Embeddings** | sentence-transformers | Local embeddings |
 | **LLM** | OpenRouter (GPT-4o-mini) | Response generation |
 | **FHIR** | fhir.resources | Healthcare resources |
